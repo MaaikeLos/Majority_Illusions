@@ -1,3 +1,6 @@
+# Code for data analysis of the paper 'On the Graph Theory of Majority Illusions: Theoretical Results and Computational Experiments'
+# Authors: Maaike Venema-Los (University of Groningen, m.d.los@rug.nl), Zoé Christoff, and Davide Grossi.
+
 library(ggplot2)
 library(ggrepel) # For labeling the points in a scatter plot
 
@@ -64,7 +67,6 @@ ggplot(averages_fb_mwmi, aes(x=p_blue)) +
                       values = c('#99C1C1', "#045D5D")) +
   scale_y_continuous(name = "fraction of runs with illusion") +
   scale_x_discrete(name = "p_blue") +
-  #ggtitle("Fraction of networks in which there is (weak-)majority-(weak-)majority illusion") +
   theme(axis.text=element_text(size=20),
         axis.title=element_text(size=20,face="bold"),
         legend.text = element_text(size = 20)) 

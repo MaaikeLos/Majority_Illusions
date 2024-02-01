@@ -1,3 +1,7 @@
+# Code for computational experiments from the paper
+# 'On the Graph Theory of Majority Illusions: Theoretical Results and Computational Experiments'
+# by Maaike Venema-Los (University of Groningen, m.d.los@rug.nl), Zoé Christoff, and Davide Grossi.
+
 import numpy as np
 import pandas as pd
 import networkx as nx

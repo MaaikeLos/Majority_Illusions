@@ -1,10 +1,14 @@
+# Code for data analysis of the paper 'On the Graph Theory of Majority Illusions: Theoretical Results and Computational Experiments'
+# Authors: Maaike Venema-Los (University of Groningen, m.d.los@rug.nl), Zoé Christoff, and Davide Grossi.
+
 library(ggplot2)
 library(ggrepel) # For labeling the points in a scatter plot
 
 ####
 df_HK <- read.csv("HK_data.csv", header = TRUE, sep = ';') 
-
 View(df_HK)
+names(df_HK)[names(df_HK) == 'CC'] <- 'clustering_coefficient'
+
 
 #Are there graphs that consist of more than one component?
 any(df_HK$frac_largest_comp != 1) # Gives FALSE: no
@@ -63,7 +67,6 @@ ggplot(df_HK_combined, aes(x=p_blue, y = nr_nodes_ill/n, color = combined)) +
 #All values of p_blue together, all values of m together (=influence of n):
 ggplot(df_HK_combined, aes(x=factor(n), y = nr_nodes_ill/n, color = combined)) + 
   geom_boxplot() + 
-  #facet_grid(~n) +
   scale_y_continuous(name = "Fraction of nodes under illusion") +
   scale_x_discrete(name = "n") +
   scale_colour_manual("", 
@@ -78,7 +81,6 @@ ggplot(df_HK_combined, aes(x=factor(n), y = nr_nodes_ill/n, color = combined)) +
 #All values of p_blue together, all values of n together (=influence of m):
 ggplot(df_HK_combined, aes(x=m_relative, y = nr_nodes_ill/n, color = combined)) + 
   geom_boxplot() + 
-  #facet_grid(~n) +
   scale_y_continuous(name = "Fraction of nodes under illusion") +
   scale_x_discrete(name = "Relative m") +
   scale_colour_manual("", 
@@ -92,7 +94,6 @@ ggplot(df_HK_combined, aes(x=m_relative, y = nr_nodes_ill/n, color = combined)) 
 #All values of m together, all values of n together (=influence of p_blue):
 ggplot(df_HK_combined, aes(x=p_blue, y = nr_nodes_ill/n, color = combined)) + 
   geom_boxplot() + 
-  #facet_grid(~n) +
   scale_y_continuous(name = "Fraction of nodes under illusion") +
   scale_x_discrete(name = "p_blue") +
   scale_colour_manual("", 
@@ -112,19 +113,16 @@ df_HK$wmmi <- replace(df_HK$mi, df_HK$mi == 'wmmi' | df_HK$mi == 'mmi', 1)
 df_HK$wmmi <- replace(df_HK$wmmi, df_HK$wmmi == 'no_strict', 0)
 df_HK<-transform(df_HK, wmmi = as.numeric((wmmi)))
 averages_HK_wmmi <- aggregate(wmmi ~ n + m_relative  + p_blue, data = df_HK, FUN = mean, na.rm = TRUE)
-
 #mmi
 df_HK$mmi <- replace(df_HK$mi, df_HK$mi == 'mmi', 1)
 df_HK$mmi <- replace(df_HK$mmi, df_HK$mmi == 'wmmi' | df_HK$mmi == 'no_strict', 0)
 df_HK<-transform(df_HK, mmi = as.numeric((mmi)))
 averages_HK_mmi <- aggregate(mmi ~ n + m_relative  + p_blue, data = df_HK, FUN = mean, na.rm = TRUE)
-
 #wmwmi
 df_HK$wmwmi <- replace(df_HK$wmi, df_HK$wmi == 'wmwmi' | df_HK$wmi == 'mwmi', 1)
 df_HK$wmwmi <- replace(df_HK$wmwmi, df_HK$wmwmi == 'no_weak', 0)
 df_HK<-transform(df_HK, wmwmi = as.numeric((wmwmi)))
 averages_HK_wmwmi <- aggregate(wmwmi ~ n + m_relative  + p_blue, data = df_HK, FUN = mean, na.rm = TRUE)
-
 #mwmi
 df_HK$mwmi <- replace(df_HK$wmi, df_HK$wmi == 'mwmi', 1)
 df_HK$mwmi <- replace(df_HK$mwmi, df_HK$mwmi == 'wmwmi' | df_HK$mwmi == 'no_weak', 0)
@@ -222,6 +220,7 @@ ggplot(averages_HK_wmwmi, aes(x=n)) +
 
 # Need to use the df_HK where variables are not made into factors yet below:
 df_HK <- read.csv("HK_data.csv", header = TRUE, sep = ';') 
+names(df_HK)[names(df_HK) == 'CC'] <- 'clustering_coefficient'
 
 # Add homophily as one variable
 df_HK$homophily <- df_HK$probability_mixed_edge - df_HK$actual_fraction_mixed_edges 
@@ -233,14 +232,14 @@ df_HK$frac_nodes_weak <-df_HK$nr_nodes_weak_ill/df_HK$n
 ## Perform an ANOVA on all variables:
 
 # Fraction of nodes under strict illusion:
-res_HK <- aov(frac_nodes_strict~ n + m + p + p_blue + deg_assort_coef + avg_path_length + CC + avg_degree + avg_EV_centr + avg_close_centr + avg_between_centr + homophily, data = df_HK)
-summary(res_HK)  #ANOVA shows that most variables are relevant: only not p, average degree and EV centrality. 
+res_HK <- aov(frac_nodes_strict~ n + m + p + p_blue + deg_assort_coef + avg_path_length + clustering_coefficient + avg_degree + avg_EV_centr + avg_close_centr + avg_between_centr + homophily, data = df_HK)
+summary(res_HK)  #ANOVA shows that most variables are relevant: only not p, average degree and average EV centrality. 
 eta_test_HK <- lsr::etaSquared(res_HK)
 eta_test_HK # 0.01: small effect; 0.06: medium effect; 0.14: large effect -> Only p-blue and homophily have a large effect, the others have no effect.
 
 # Fraction of nodes under weak illusion:
-res_HK_weak <- aov(frac_nodes_weak ~ n + m + p + p_blue + deg_assort_coef + avg_path_length + CC + avg_degree + avg_EV_centr + avg_close_centr + avg_between_centr + homophily, data = df_HK)
-summary(res_HK_weak)  #ANOVA shows that most variables are relevant: only not p.
+res_HK_weak <- aov(frac_nodes_weak ~ n + m + p + p_blue + deg_assort_coef + avg_path_length + clustering_coefficient + avg_degree + avg_EV_centr + avg_close_centr + avg_between_centr + homophily, data = df_HK)
+summary(res_HK_weak)  #ANOVA shows that all variables are relevant
 eta_test_HK_weak <- lsr::etaSquared(res_HK_weak)
 eta_test_HK_weak # 0.01: small effect; 0.06: medium effect; 0.14: large effect -> Only p-blue and homophily hav a large effect, the others have no effect.
 
@@ -252,16 +251,16 @@ df_HK_05 <- df_HK[df_HK$p_blue == 0.5,]
 ## ANOVA on all variables for p_blue = 0.5:
 
 # Fraction of nodes under strict illusion:
-res_HK_05 <- aov(frac_nodes_strict ~ n + m + p  + deg_assort_coef + avg_path_length + CC + avg_degree + avg_EV_centr + avg_close_centr + avg_between_centr + homophily, data = df_HK_05)
-summary(res_HK_05)  #ANOVA shows that most variables are relevant: only not m, (p,) and closeness centrality. 
+res_HK_05 <- aov(frac_nodes_strict ~ n + m + p  + deg_assort_coef + avg_path_length + clustering_coefficient + avg_degree + avg_EV_centr + avg_close_centr + avg_between_centr + homophily, data = df_HK_05)
+summary(res_HK_05)  #ANOVA shows that most variables are relevant: only not p and average closeness centrality. 
 eta_test_HK_05 <- lsr::etaSquared(res_HK_05)
-eta_test_HK_05 # 0.01: small effect; 0.06: medium effect; 0.14: large effect ->Nothing has effect
+eta_test_HK_05 # 0.01: small effect; 0.06: medium effect; 0.14: large effect -> Only homophily has large effect, others have no effect.
 
 # Fraction of nodes under weak illusion:
-res_HK_weak_05 <- aov(frac_nodes_weak ~ n + m + p + deg_assort_coef + avg_path_length + CC + avg_degree + avg_EV_centr + avg_close_centr + avg_between_centr + homophily, data = df_HK_05)
-summary(res_HK_weak_05)  #ANOVA shows that most variables are relevant: only not (m,) p, (and betweenness centr)
+res_HK_weak_05 <- aov(frac_nodes_weak ~ n + m + p + deg_assort_coef + avg_path_length + clustering_coefficient + avg_degree + avg_EV_centr + avg_close_centr + avg_between_centr + homophily, data = df_HK_05)
+summary(res_HK_weak_05)  #ANOVA shows that most variables are relevant: only not  p
 eta_test_HK_weak_05 <- lsr::etaSquared(res_HK_weak_05)
-eta_test_HK_weak_05 # 0.01: small effect; 0.06: medium effect; 0.14: large effect -> Nothing has effect
+eta_test_HK_weak_05 # 0.01: small effect; 0.06: medium effect; 0.14: large effect -> Only homophily has medium effect, others have no effect.
 
 
 ## Correlationmatrix
@@ -271,11 +270,10 @@ library(reshape2)
 library("Hmisc")
 
 #Choose whether you want a correlation matrix of the total dataset or only for p_blue = 0.5:
-df_clean_HK <- subset(df_HK, select = c(n, m, p_blue, p,  deg_assort_coef, avg_path_length, CC, avg_degree, avg_EV_centr, avg_close_centr, avg_between_centr, homophily, frac_nodes_strict, frac_nodes_weak) ) # if p_blue not specified
-df_clean_HK <- subset(df_HK_05, select = c(n, m, p,  deg_assort_coef, avg_path_length, CC, avg_degree, avg_EV_centr, avg_close_centr, avg_between_centr, homophily, frac_nodes_strict, frac_nodes_weak) ) # if p_blue = 0.5
+df_clean_HK <- subset(df_HK, select = c(n, m, p_blue, p,  deg_assort_coef, avg_path_length, clustering_coefficient, avg_degree, avg_EV_centr, avg_close_centr, avg_between_centr, homophily, frac_nodes_strict, frac_nodes_weak) ) # if p_blue not specified
+df_clean_HK <- subset(df_HK_05, select = c(n, m, p,  deg_assort_coef, avg_path_length, clustering_coefficient, avg_degree, avg_EV_centr, avg_close_centr, avg_between_centr, homophily, frac_nodes_strict, frac_nodes_weak) ) # if p_blue = 0.5
 
 cormat <- round(cor(df_clean_HK, use='pairwise.complete.obs'),2)
-melted_cormat <- melt(cormat)
 
 #get significance
 sig <- rcorr(as.matrix(df_clean_HK))
@@ -291,22 +289,10 @@ get_upper_tri <- function(cormat){
   cormat[lower.tri(cormat)]<- NA
   return(cormat)
 }
-upper_tri <- get_upper_tri(cormat)
 
-melted_cormat <- melt(upper_tri, na.rm = TRUE)
-reorder_cormat <- function(cormat){
-  # Use correlation between variables as distance
-  dd <- as.dist((1-cormat)/2)
-  hc <- hclust(dd)
-  cormat <-cormat[hc$order, hc$order]
-}
-
-# Reorder the correlation matrix
-# We don't want them reordered based on correlation
-#cormat <- reorder_cormat(cormat)
 upper_tri <- get_upper_tri(cormat)
-# Melt the correlation matrix
 melted_cormat <- melt(upper_tri, na.rm = TRUE)
+
 # Create a ggheatmap
 ggheatmap <- ggplot(melted_cormat, aes(Var2, Var1, fill = value))+
   geom_tile(color = "white")+
@@ -315,7 +301,8 @@ ggheatmap <- ggplot(melted_cormat, aes(Var2, Var1, fill = value))+
                        name="Pearson\nCorrelation") +
   theme_minimal()+ # minimal theme
   theme(axis.text.x = element_text(angle = 45, vjust = 1, 
-                                   size = 12, hjust = 1))+
+                                   size = 12, hjust = 1),
+        axis.text.y = element_text(size =12))+
   coord_fixed()
 
 ggheatmap + 

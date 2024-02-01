@@ -1,8 +1,14 @@
+# Code for data analysis of the paper 'On the Graph Theory of Majority Illusions: Theoretical Results and Computational Experiments'
+# Authors: Maaike Venema-Los (University of Groningen, m.d.los@rug.nl), Zoé Christoff, and Davide Grossi.
+
 library(ggplot2)
 library(ggrepel) # For labeling the points in a scatter plot
+library(tidyverse)
 
 ####
+### Load data:
 df_ER <- read.csv("ER_data.csv", header = TRUE, sep = ';')
+names(df_ER)[names(df_ER) == 'CC'] <- 'clustering_coefficient'
 View(df_ER)
 
 #Are there graphs that consist of more than one component?
@@ -34,17 +40,19 @@ ggplot(df_ER_combined, aes(x=p_blue, y = nr_nodes_ill/n, color = combined)) +
   scale_colour_manual("", 
                       breaks = c("strict", "weak"),
                       values = c( "#045D5D", "#99C1C1"))+
+  ggtitle("n") +
   theme(axis.text=element_text(size=12),
         axis.title=element_text(size=14,face="bold"),
         legend.text = element_text(size = 14),
-        strip.text = element_text(size=12))
+        strip.text = element_text(size=12),
+        plot.title = element_text(size = 14, face = "bold", hjust = 0.5))
+#(Save as 12x8 inch pdf for readability)
 
 ## Separate plots for different parameters:
 
 #All values of p_blue together, all values of p_edge together (=influence of n):
 ggplot(df_ER_combined, aes(x=factor(n), y = nr_nodes_ill/n, color = combined)) + 
   geom_boxplot() + 
-  #facet_grid(~n) +
   scale_y_continuous(name = "Fraction of nodes under illusion") +
   scale_x_discrete(name = "n") +
   scale_colour_manual("", 
@@ -58,7 +66,6 @@ ggplot(df_ER_combined, aes(x=factor(n), y = nr_nodes_ill/n, color = combined)) +
 #All values of p_blue together, all values of n together (=influence of p_edge):
 ggplot(df_ER_combined, aes(x=p_edge, y = nr_nodes_ill/n, color = combined)) + 
   geom_boxplot() + 
-  #facet_grid(~n) +
   scale_y_continuous(name = "Fraction of nodes under illusion") +
   scale_x_discrete(name = "p_edge") +
   scale_colour_manual("", 
@@ -72,7 +79,6 @@ ggplot(df_ER_combined, aes(x=p_edge, y = nr_nodes_ill/n, color = combined)) +
 #All values of p_edge together, all values of n together (=influence of p_blue):
 ggplot(df_ER_combined, aes(x=p_blue, y = nr_nodes_ill/n, color = combined)) + 
   geom_boxplot() + 
-  #facet_grid(~n) +
   scale_y_continuous(name = "Fraction of nodes under illusion") +
   scale_x_discrete(name = "p_blue") +
   scale_colour_manual("", 
@@ -120,11 +126,13 @@ ggplot(averages_ER_wmwmi, aes(x=p_blue)) +
   facet_grid(p_edge~n) +
   scale_y_continuous(name = "fraction of runs with illusion") +
   scale_x_discrete(name = "p_blue") +
-  #ggtitle("Fraction of networks in which there is (weak-)majority-(weak-)majority illusion") +
+  ggtitle("n") +
   theme(axis.text=element_text(size=12),
         axis.title=element_text(size=14,face="bold"),
         legend.text = element_text(size = 14),
-        strip.text = element_text(size=12))
+        strip.text = element_text(size=12),
+        plot.title = element_text(size = 14, face = "bold", hjust = 0.5))
+#(Save as 12x6 inch pdf for readability)
 
 ## Separate plots for different parameters:
 
@@ -142,10 +150,8 @@ ggplot(averages_ER_wmwmi, aes(x=p_blue)) +
   scale_colour_manual("", 
                       breaks = c("wmwmi", "mwmi", "wmmi", "mmi"),
                       values = c('#99C1C1', "#045D5D", "pink", "#990033")) +
-  #facet_grid(p_edge~n) +
   scale_y_continuous(name = "fraction of runs with illusion") +
   scale_x_discrete(name = "p_blue") +
-  #ggtitle("Fraction of networks in which there is (weak-)majority-(weak-)majority illusion") +
   theme(axis.text=element_text(size=16),
         axis.title=element_text(size=18,face="bold"),
         legend.text = element_text(size = 18),
@@ -165,10 +171,8 @@ ggplot(averages_ER_wmwmi, aes(x=p_edge)) +
   scale_colour_manual("", 
                       breaks = c("wmwmi", "mwmi", "wmmi", "mmi"),
                       values = c('#99C1C1', "#045D5D", "pink", "#990033")) +
-  #facet_grid(p_edge~n) +
   scale_y_continuous(name = "fraction of runs with illusion") +
   scale_x_discrete(name = "p_edge") +
-  #ggtitle("Fraction of networks in which there is (weak-)majority-(weak-)majority illusion") +
   theme(axis.text=element_text(size=16),
         axis.title=element_text(size=18,face="bold"),
         legend.text = element_text(size = 18),
@@ -189,10 +193,8 @@ ggplot(averages_ER_wmwmi, aes(x=n)) +
   scale_colour_manual("", 
                       breaks = c("wmwmi", "mwmi", "wmmi", "mmi"),
                       values = c('#99C1C1', "#045D5D", "pink", "#990033")) +
-  #facet_grid(p_edge~n) +
   scale_y_continuous(name = "fraction of runs with illusion") +
   scale_x_discrete(name = "n") +
-  #ggtitle("Fraction of networks in which there is (weak-)majority-(weak-)majority illusion") +
   theme(axis.text=element_text(size=16),
         axis.title=element_text(size=18,face="bold"),
         legend.text = element_text(size = 18),
@@ -202,6 +204,7 @@ ggplot(averages_ER_wmwmi, aes(x=n)) +
 
 # NB! Need the dataframe where variables are not yet made a factor. 
 df_ER <- read.csv("ER_data.csv", header = TRUE, sep = ';')
+names(df_ER)[names(df_ER) == 'CC'] <- 'clustering_coefficient'
 # Add homophily as one variable
 df_ER$homophily <- df_ER$probability_mixed_edge - df_ER$actual_fraction_mixed_edges 
 
@@ -211,14 +214,14 @@ df_ER$frac_nodes_weak_ill <-df_ER$nr_nodes_weak_ill/df_ER$n
 
 # Perform an ANOVA on all variables:
 #Fraction of nodes under strict illusion:
-res_ER <- aov(frac_nodes_strict_ill ~ n + p_edge + p_blue + deg_assort_coef + avg_path_length + CC + avg_degree + avg_EV_centr + avg_close_centr + avg_between_centr + homophily, data = df_ER)
+res_ER <- aov(frac_nodes_strict_ill ~ n + p_edge + p_blue + deg_assort_coef + avg_path_length + clustering_coefficient + avg_degree + avg_EV_centr + avg_close_centr + avg_between_centr + homophily, data = df_ER)
 summary(res_ER)  #ANOVA shows that all variables except degree assortativity coefficient and average degree are significantly relevant
 eta_test_ER <- lsr::etaSquared(res_ER)
-eta_test_ER # 0.01: small effect; 0.06: medium effect; 0.14: large effect ->  p_blue has large effect, others have no effect.
+eta_test_ER # 0.01: small effect; 0.06: medium effect; 0.14: large effect ->  p_blue has large effect homophily has small effect, others have no effect.
 
 #Fraction of nodes under weak illusion:
-res_ER_weak <- aov(frac_nodes_weak_ill ~ n + p_edge + p_blue + deg_assort_coef + avg_path_length + CC + avg_degree + avg_EV_centr + avg_close_centr + avg_between_centr + homophily, data = df_ER)
-summary(res_ER_weak)  #ANOVA shows that all variables are relevant. 
+res_ER_weak <- aov(frac_nodes_weak_ill ~ n + p_edge + p_blue + deg_assort_coef + avg_path_length + clustering_coefficient + avg_degree + avg_EV_centr + avg_close_centr + avg_between_centr + homophily, data = df_ER)
+summary(res_ER_weak)  #ANOVA shows that all variables except average betweenness centrality are relevant. 
 eta_test_ER_weak <- lsr::etaSquared(res_ER_weak)
 eta_test_ER_weak # 0.01: small effect; 0.06: medium effect; 0.14: large effect -> Only p-blue has a large effect, the others have no effect.
 
@@ -227,10 +230,9 @@ eta_test_ER_weak # 0.01: small effect; 0.06: medium effect; 0.14: large effect -
 library(reshape2)
 library("Hmisc")
 
-df_clean_ER <- subset(df_ER, select = c(n, p_edge, p_blue,  deg_assort_coef, avg_path_length, CC, avg_degree, avg_EV_centr, avg_close_centr, avg_between_centr, homophily, frac_nodes_strict_ill, frac_nodes_weak_ill) ) 
+df_clean_ER <- subset(df_ER, select = c(n, p_edge, p_blue,  deg_assort_coef, avg_path_length, clustering_coefficient, avg_degree, avg_EV_centr, avg_close_centr, avg_between_centr, homophily, frac_nodes_strict_ill, frac_nodes_weak_ill) ) 
 #df_clean[is.na(df_clean)] <- 0 #Better to use pairwise.complete.obs like below, otherwise the values are misleading.
 cormat <- round(cor(df_clean_ER, use='pairwise.complete.obs'),2)
-melted_cormat <- melt(cormat)
 
 #get significance
 sig <- rcorr(as.matrix(df_clean_ER))
@@ -247,20 +249,8 @@ get_upper_tri <- function(cormat){
   return(cormat)
 }
 upper_tri <- get_upper_tri(cormat)
-
 melted_cormat <- melt(upper_tri, na.rm = TRUE)
-#reorder_cormat <- function(cormat){
-#  # Use correlation between variables as distance
-#  dd <- as.dist((1-cormat)/2)
-#  hc <- hclust(dd)
-#  cormat <-cormat[hc$order, hc$order]
-#}
 
-# Reorder the correlation matrix
-#cormat <- reorder_cormat(cormat)
-upper_tri <- get_upper_tri(cormat)
-# Melt the correlation matrix
-melted_cormat <- melt(upper_tri, na.rm = TRUE)
 # Create a ggheatmap
 ggheatmap <- ggplot(melted_cormat, aes(Var2, Var1, fill = value))+
   geom_tile(color = "white")+
@@ -269,8 +259,8 @@ ggheatmap <- ggplot(melted_cormat, aes(Var2, Var1, fill = value))+
                        name="Pearson\nCorrelation") +
   theme_minimal()+ # minimal theme
   theme(axis.text.x = element_text(angle = 45, vjust = 1, 
-                                   size = 15, hjust = 1),
-        axis.text.y = element_text(size =15))+
+                                   size = 12, hjust = 1),
+        axis.text.y = element_text(size =12))+
   coord_fixed()
 
 ggheatmap + 
