@@ -1,4 +1,4 @@
-##### Version 29-1-2025, Maaike Venema-Los #####
+##### Version 18-2-2025, Maaike Venema-Los #####
 
 library(dplyr)
 library(ggplot2)
@@ -337,11 +337,10 @@ df_ER_grouped_general <- group_by(df_ER, n_combined, p_edge, blue_global_bins)
 summary_ER_general <- make_summary_median(df_ER_grouped_general)
 
 ggplot(summary_ER_general, aes(x=blue_global_bins))+
-  geom_bar(data = df_ER_grouped_general, aes(y = after_stat(count)/sum(after_stat(count))), fill = 'gray80')+ #This is the division of the data
   geom_pointrange(aes(y=median, ymin = Q1, ymax = Q3, color = illusion_type), position = position_dodge(width = 0.5), size = 0.5, linewidth = 1)+
   facet_grid(p_edge~n_combined)+
-  labs(title = "Median (and IQR) fraction of nodes under m/w illusion (ER graphs)\n n")+
-  #labs(title = "n")+ # Without title for paper
+  #labs(title = "Median (and IQR) fraction of nodes under m/w illusion (ER graphs)\n n")+
+  labs(title = "n")+ # Without title for paper
   scale_color_manual(values = c( "tomato3", "paleturquoise3"), name = "Illusion type", labels = c('m illusion', 'w illusion'))+
   scale_x_discrete(name = "Proportion blue/red globally", labels = c("0-.1", ".1-.2", ".2-.3", ".3-.4", ".4-.5")) +
   scale_y_continuous(name = "Median fraction of nodes under illusion", sec.axis = sec_axis(~ . , name = "p_edge", breaks = NULL, labels = NULL)) +
@@ -384,11 +383,10 @@ ggsave('MSE_ER.pdf', width = 15, height = 9, dpi = 1000)
 df_HK_grouped_general <- group_by(df_HK, n_combined, m_relative, blue_global_bins)
 summary_HK_general <- make_summary_median(df_HK_grouped_general)
 ggplot(summary_HK_general, aes(x=blue_global_bins))+
-  geom_bar(data = df_HK_grouped_general, aes(y = (..count..)/sum(..count..)), fill = 'gray80')+ #This is the division of the data
   geom_pointrange(aes(y=median, ymin = Q1, ymax = Q3, color = illusion_type), position = position_dodge(width = 0.5), size = 0.5, linewidth = 1)+
   facet_grid(m_relative~n_combined)+
-  labs(title = "Median (and IQR) fraction of nodes under strict / only weak illusion (HK graphs)\n n")+
-  #labs(title = "n")+
+  #labs(title = "Median (and IQR) fraction of nodes under strict / only weak illusion (HK graphs)\n n")+
+  labs(title = "n")+
   scale_color_manual(values = c( "tomato3", "paleturquoise3"), name = "Illusion type", labels = c('m illusion', 'w illusion'))+
   scale_x_discrete(name = "Proportion blue/red globally", labels = c("0-.1", ".1-.2", ".2-.3", ".3-.4", ".4-.5")) +
   scale_y_continuous(name = "Median fraction of nodes under illusion", sec.axis = sec_axis(~ . , name = "m", breaks = NULL, labels = NULL)) +

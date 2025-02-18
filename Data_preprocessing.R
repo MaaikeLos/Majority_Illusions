@@ -1,14 +1,14 @@
-##### Version 29-1-2025, Maaike Venema-Los #####
+##### Version 18-2-2025, Maaike Venema-Los #####
 library(rstudioapi)
 library(dplyr)
 
-# Set working directory to source file location.(Session -> Set Working Wirectory -> To Source File Location)
+# Set working directory to source file location.(Session -> Set Working Directory -> To Source File Location)
 # Choose one of the two options below:
 
 ### 1. Read original data ###
 df_HK <- read.csv("Data/HK_data.csv")
 df_ER <- read.csv("Data/ER_data.csv")
-df_FB <- read.csv("Data/FB_data_1.csv")
+df_FB <- read.csv("Data/FB_data.csv")
 
 ### 2. Read newly generated data ###
 # Getting the path of the current open file to set working directory
